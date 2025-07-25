@@ -1,30 +1,30 @@
 group: arxivrollbench2024b
 
 task:
-    - robench-2024b-all-setcsSCP-s.yaml
-    - robench-2024b-all-seteconSCP-s.yaml
-    - robench-2024b-all-seteessSCP-s.yaml
-    - robench-2024b-all-setmathSCP-s.yaml
-    - robench-2024b-all-setphysicsSCP-s.yaml
-    - robench-2024b-all-setq-bioSCP-s.yaml
-    - robench-2024b-all-setq-finSCP-s.yaml
-    - robench-2024b-all-setstatSCP-s.yaml
-    - robench-2024b-all-setcsSCP-c.yaml
-    - robench-2024b-all-seteconSCP-c.yaml
-    - robench-2024b-all-seteessSCP-c.yaml
-    - robench-2024b-all-setmathSCP-c.yaml
-    - robench-2024b-all-setphysicsSCP-c.yaml
-    - robench-2024b-all-setq-bioSCP-c.yaml
-    - robench-2024b-all-setq-finSCP-c.yaml
-    - robench-2024b-all-setstatSCP-c.yaml
-    - robench-2024b-all-setcsSCP-p.yaml
-    - robench-2024b-all-seteconSCP-p.yaml
-    - robench-2024b-all-seteessSCP-p.yaml
-    - robench-2024b-all-setmathSCP-p.yaml
-    - robench-2024b-all-setphysicsSCP-p.yaml
-    - robench-2024b-all-setq-bioSCP-p.yaml
-    - robench-2024b-all-setq-finSCP-p.yaml
-    - robench-2024b-all-setstatSCP-p.yaml
+    - robench2024b_all_setcsSCP-p
+    - robench2024b_all_seteconSCP-p
+    - robench2024b_all_seteessSCP-p
+    - robench2024b_all_setmathSCP-p
+    - robench2024b_all_setphysicsSCP-p
+    - robench2024b_all_setq-bioSCP-p
+    - robench2024b_all_setq-finSCP-p
+    - robench2024b_all_setstatSCP-p
+    - robench2024b_all_setcsSCP-s
+    - robench2024b_all_seteconSCP-s
+    - robench2024b_all_seteessSCP-s
+    - robench2024b_all_setmathSCP-s
+    - robench2024b_all_setphysicsSCP-s
+    - robench2024b_all_setq-bioSCP-s
+    - robench2024b_all_setq-finSCP-s
+    - robench2024b_all_setstatSCP-s
+    - robench2024b_all_setcsSCP-c
+    - robench2024b_all_seteconSCP-c
+    - robench2024b_all_seteessSCP-c
+    - robench2024b_all_setmathSCP-c
+    - robench2024b_all_setphysicsSCP-c
+    - robench2024b_all_setq-bioSCP-c
+    - robench2024b_all_setq-finSCP-c
+    - robench2024b_all_setstatSCP-c
 
 
 aggregate_metric_list:
