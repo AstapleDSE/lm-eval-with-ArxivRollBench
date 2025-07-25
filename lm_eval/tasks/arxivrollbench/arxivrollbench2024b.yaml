@@ -30,7 +30,6 @@ task:
 aggregate_metric_list:
   - aggregation: mean
     metric: exact_match
-    higher_is_better: true
     weight_by_size: false
 metadata:
   version: 0.2
