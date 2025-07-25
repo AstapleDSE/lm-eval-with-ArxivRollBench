@@ -1,0 +1,31 @@
+task: robench2024b_all_setq-finSCP-s
+dataset_path: liangzid/robench2024b_all_setq-finSCP-s
+dataset_name: null
+output_type: generate_until
+training_split: null 
+validation_split: null
+test_split: train
+doc_to_text: "## Instruction:\n Given a **shuffled text** composed of sentences A, B, and C, your task is to select the correct order from four available selections. Avoid providing any additional information (such as explanations of your choice) or restating the sentences in your answer. Simply provide your selection: Selection 1, Selection 2, Selection 3, or Selection 4.\n## Shuffled text:\n{{shuffled_text}}\n## Choice:\n**Selection 1** {{A}}\n**Selection 2** {{B}}\n**Selection 3** {{C}}\n**Selection 4** {{D}}\nAnswer:"
+doc_to_target: label
+# doc_to_choice: "{{[\"A\",\"B\",\"C\",\"D\"]}}"
+should_decontaminate: false
+generation_kwargs:
+  until:
+    - "."
+    - ","
+    - "\n"
+  do_sample: false
+  temperature: 0.0
+  max_gen_toks: 50
+filter_list:
+  - name: "score-first"
+    filter:
+      - function: "regex"
+        regex_pattern: "(Selection [0-9])"
+      - function: "take_first"
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 0.2

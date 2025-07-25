@@ -1,0 +1,36 @@
+group: arxivrollbench2024b
+
+task:
+    - robench-2024b-all-setcsSCP-s.yaml
+    - robench-2024b-all-seteconSCP-s.yaml
+    - robench-2024b-all-seteessSCP-s.yaml
+    - robench-2024b-all-setmathSCP-s.yaml
+    - robench-2024b-all-setphysicsSCP-s.yaml
+    - robench-2024b-all-setq-bioSCP-s.yaml
+    - robench-2024b-all-setq-finSCP-s.yaml
+    - robench-2024b-all-setstatSCP-s.yaml
+    - robench-2024b-all-setcsSCP-c.yaml
+    - robench-2024b-all-seteconSCP-c.yaml
+    - robench-2024b-all-seteessSCP-c.yaml
+    - robench-2024b-all-setmathSCP-c.yaml
+    - robench-2024b-all-setphysicsSCP-c.yaml
+    - robench-2024b-all-setq-bioSCP-c.yaml
+    - robench-2024b-all-setq-finSCP-c.yaml
+    - robench-2024b-all-setstatSCP-c.yaml
+    - robench-2024b-all-setcsSCP-p.yaml
+    - robench-2024b-all-seteconSCP-p.yaml
+    - robench-2024b-all-seteessSCP-p.yaml
+    - robench-2024b-all-setmathSCP-p.yaml
+    - robench-2024b-all-setphysicsSCP-p.yaml
+    - robench-2024b-all-setq-bioSCP-p.yaml
+    - robench-2024b-all-setq-finSCP-p.yaml
+    - robench-2024b-all-setstatSCP-p.yaml
+
+
+aggregate_metric_list:
+  - aggregation: mean
+    metric: exact_match
+    higher_is_better: true
+    weight_by_size: false
+metadata:
+  version: 0.2
