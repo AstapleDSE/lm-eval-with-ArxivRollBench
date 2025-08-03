@@ -1,0 +1,36 @@
+group: arxivrollbench2025a
+
+task:
+    - robench2025a_all_setcsSCP-p
+    - robench2025a_all_seteconSCP-p
+    - robench2025a_all_seteessSCP-p
+    - robench2025a_all_setmathSCP-p
+    - robench2025a_all_setphysicsSCP-p
+    - robench2025a_all_setq-bioSCP-p
+    - robench2025a_all_setq-finSCP-p
+    - robench2025a_all_setstatSCP-p
+    - robench2025a_all_setcsSCP-s
+    - robench2025a_all_seteconSCP-s
+    - robench2025a_all_seteessSCP-s
+    - robench2025a_all_setmathSCP-s
+    - robench2025a_all_setphysicsSCP-s
+    - robench2025a_all_setq-bioSCP-s
+    - robench2025a_all_setq-finSCP-s
+    - robench2025a_all_setstatSCP-s
+    - robench2025a_all_setcsSCP-c
+    - robench2025a_all_seteconSCP-c
+    - robench2025a_all_seteessSCP-c
+    - robench2025a_all_setmathSCP-c
+    - robench2025a_all_setphysicsSCP-c
+    - robench2025a_all_setq-bioSCP-c
+    - robench2025a_all_setq-finSCP-c
+    - robench2025a_all_setstatSCP-c
+
+
+aggregate_metric_list:
+  - aggregation: mean
+    metric: exact_match
+    weight_by_size: false
+metadata:
+  version: 0.1
+
