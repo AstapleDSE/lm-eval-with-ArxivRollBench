@@ -25,7 +25,8 @@ export scp_type=("s" "c" "p")
 # ==============================================================================================
 ## Automatically Replacement for SCP 50 samples
 
-export field_ls=("econ" "eess" "math" "physics" "q-bio" "q-fin" "stat")
+# export field_ls=("cs" "econ" "eess" "math" "physics" "q-bio" "q-fin" "stat")
+export field_ls=("cs")
 export scp_type=("s" "c" "p")
 
 for field in ${field_ls[*]}
