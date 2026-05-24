@@ -137,6 +137,7 @@ class TemplateAPI(TemplateLM):
         timeout: int = 300,
         header: Optional[Dict[str, str]] = None,
         max_images: int = 1,
+        omit_temperature: bool = False,
         **kwargs,
     ) -> None:
         super().__init__()
@@ -166,6 +167,11 @@ class TemplateAPI(TemplateLM):
         self._truncate = truncate
         self._max_gen_toks = int(max_gen_toks)
         self._seed = int(seed)
+        self.omit_temperature = (
+            omit_temperature
+            if isinstance(omit_temperature, bool)
+            else str(omit_temperature).lower() in ("1", "true", "yes")
+        )
         # max_length - 1 as we always have 1 token for generation
         eval_logger.info(f"Using max length {max_length} - 1")
         self.max_length = max_length - 1
@@ -712,33 +718,53 @@ class TemplateAPI(TemplateLM):
                         )
 
                 req = encodings_list if self.tokenized_requests else contexts
-                outputs = retry(
-                    stop=stop_after_attempt(self.max_retries),
-                    wait=wait_exponential(multiplier=0.5, min=1, max=10),
-                    reraise=True,
-                )(self.model_call)(
-                    messages=req,
-                    generate=True,
-                    gen_kwargs=copy.deepcopy(all_gen_kwargs[0]),
-                )
-                for generated_text, context in zip(
+                try:
+                    outputs = retry(
+                        stop=stop_after_attempt(self.max_retries),
+                        wait=wait_exponential(multiplier=0.5, min=1, max=10),
+                        reraise=True,
+                    )(self.model_call)(
+                        messages=req,
+                        generate=True,
+                        gen_kwargs=copy.deepcopy(all_gen_kwargs[0]),
+                    )
+                except Exception as e:
+                    eval_logger.warning(
+                        "API request failed after retries; scoring this request as an empty string. error=%r",
+                        e,
+                    )
+                    outputs = {"error": repr(e)}
+                generations = list(
                     self.parse_generations(
                         outputs=outputs,
                         contexts=contexts,
-                    ),
-                    contexts,
-                ):
-                    if generated_text is not None:
-                        res.append(generated_text)
+                    )
+                )
+                if len(generations) != len(contexts):
+                    eval_logger.warning(
+                        "API returned %d generations for %d contexts; padding missing generations with empty strings.",
+                        len(generations),
+                        len(contexts),
+                    )
+                    generations.extend([""] * (len(contexts) - len(generations)))
 
-                        # partial caching
-                        if context is not None:
-                            self.cache_hook.add_partial(
-                                "generate_until",
-                                (context, all_gen_kwargs[0]),
-                                generated_text,
-                            )
-                            pbar.update(1)
+                for generated_text, context in zip(generations, contexts):
+                    if generated_text is None:
+                        eval_logger.warning(
+                            "API returned a null generation; scoring it as an empty string."
+                        )
+                        generated_text = ""
+
+                    res.append(generated_text)
+
+                    # partial caching
+                    if context is not None:
+                        self.cache_hook.add_partial(
+                            "generate_until",
+                            (context, all_gen_kwargs[0]),
+                            generated_text,
+                        )
+                    pbar.update(1)
         else:
             for chunk in chunked:
                 contexts, all_gen_kwargs, encodings_list = zip(*chunk)

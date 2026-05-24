@@ -12,6 +12,16 @@ from lm_eval.models.utils import handle_stop_sequences
 eval_logger = logging.getLogger(__name__)
 
 
+def _summarize_bad_response(out: Any) -> str:
+    if not isinstance(out, dict):
+        return f"non-dict response of type {type(out).__name__}"
+
+    keys = sorted(out.keys())
+    if "error" in out:
+        return f"response keys={keys}, error={out.get('error')!r}"
+    return f"response keys={keys}"
+
+
 @register_model("local-completions")
 class LocalCompletionsAPI(TemplateAPI):
     def __init__(
@@ -93,9 +103,31 @@ class LocalCompletionsAPI(TemplateAPI):
         if not isinstance(outputs, list):
             outputs = [outputs]
         for out in outputs:
-            tmp = [None] * len(out["choices"])
-            for choices in out["choices"]:
-                tmp[choices["index"]] = choices["text"]
+            choices_list = out.get("choices") if isinstance(out, dict) else None
+            if not isinstance(choices_list, list) or len(choices_list) == 0:
+                eval_logger.warning(
+                    "API response did not include a non-empty choices list; scoring it as an empty string. %s",
+                    _summarize_bad_response(out),
+                )
+                res.append("")
+                continue
+
+            tmp = [None] * len(choices_list)
+            for choice in choices_list:
+                if not isinstance(choice, dict):
+                    eval_logger.warning(
+                        "API returned a malformed choice; scoring that choice as an empty string. choice=%r",
+                        choice,
+                    )
+                    tmp.append("")
+                    continue
+
+                idx = choice.get("index", len(tmp))
+                if not isinstance(idx, int) or idx < 0:
+                    idx = len(tmp)
+                if idx >= len(tmp):
+                    tmp.extend([None] * (idx - len(tmp) + 1))
+                tmp[idx] = choice.get("text")
             res = res + tmp
         return res
 
@@ -149,15 +181,17 @@ class LocalChatCompletion(LocalCompletionsAPI):
         stop = handle_stop_sequences(gen_kwargs.pop("until", None), eos)
         if not isinstance(stop, (list, tuple)):
             stop = [stop]
-        return {
+        payload = {
             "messages": messages,
             "model": self.model,
             "max_tokens": max_tokens,
-            "temperature": temperature,
             "stop": stop[:4],
             "seed": seed,
             **gen_kwargs,
         }
+        if not self.omit_temperature:
+            payload["temperature"] = temperature
+        return payload
 
     @staticmethod
     def parse_generations(outputs: Union[Dict, List[Dict]], **kwargs) -> List[str]:
@@ -165,9 +199,41 @@ class LocalChatCompletion(LocalCompletionsAPI):
         if not isinstance(outputs, list):
             outputs = [outputs]
         for out in outputs:
-            tmp = [None] * len(out["choices"])
-            for choices in out["choices"]:
-                tmp[choices["index"]] = choices["message"]["content"]
+            choices_list = out.get("choices") if isinstance(out, dict) else None
+            if not isinstance(choices_list, list) or len(choices_list) == 0:
+                eval_logger.warning(
+                    "API response did not include a non-empty choices list; scoring it as an empty string. %s",
+                    _summarize_bad_response(out),
+                )
+                res.append("")
+                continue
+
+            tmp = [None] * len(choices_list)
+            for choice in choices_list:
+                if not isinstance(choice, dict):
+                    eval_logger.warning(
+                        "API returned a malformed choice; scoring that choice as an empty string. choice=%r",
+                        choice,
+                    )
+                    tmp.append("")
+                    continue
+
+                idx = choice.get("index", len(tmp))
+                if not isinstance(idx, int) or idx < 0:
+                    idx = len(tmp)
+                if idx >= len(tmp):
+                    tmp.extend([None] * (idx - len(tmp) + 1))
+
+                message = choice.get("message")
+                if not isinstance(message, dict):
+                    eval_logger.warning(
+                        "API returned a choice without a message object; scoring it as an empty string. choice keys=%s",
+                        sorted(choice.keys()),
+                    )
+                    tmp[idx] = ""
+                    continue
+
+                tmp[idx] = message.get("content")
             res = res + tmp
         return res
 
